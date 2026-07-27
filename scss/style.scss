@@ -1,0 +1,114 @@
+@use "sass:math";
+
+// Reset
+@import "_reset.scss";
+
+// Fonts
+@import "_fonts.scss";
+
+@import "_variables.scss";
+
+// components
+
+@import "_header.scss";
+@import "_hero.scss";
+@import "_sections.scss";
+@import "_footer.scss";
+
+@import "_sidebars.scss";
+
+/* Base styles */
+html,
+body {
+	height: 100%;
+
+	@media (max-width: 601px) {
+		.menu-open & {
+			overflow: hidden;
+		}
+	}
+}
+
+body {
+	font-family: "Gilroy", sans-serif;
+	font-size: 18px;
+	line-height: 1.5;
+	color: var(--main-color);
+
+	background-color: var(--bg);
+	opacity: 0;
+
+	transition: opacity 1.5s;
+
+	.loaded & {
+		opacity: 1;
+	}
+}
+
+/* Sticky footer */
+.wrapper {
+	position: relative;
+	z-index: 2;
+
+	min-height: 100%;
+	overflow: clip;
+
+	display: flex;
+	flex-direction: column;
+}
+
+.wrapper > main {
+	flex: 1 1 auto;
+}
+
+/* Container */
+[class*="__container"] {
+	max-width: 1492px;
+	margin: 0 auto;
+	padding-inline: 15px;
+}
+
+/* ========== Accessibility ========== */
+
+/* Skip to content */
+.skip-link {
+	position: absolute;
+	inset-block-start: -100%;
+	inset-inline-start: 0;
+	z-index: 1000;
+	padding: 8px 16px;
+	background-color: var(--accent);
+	color: var(--bg);
+	font-weight: 700;
+	text-decoration: none;
+
+	&:focus {
+		inset-block-start: 0;
+	}
+}
+
+/* Visible focus for keyboard users */
+:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 3px;
+}
+
+/* Reduced motion: disable animations */
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+
+	.hero__layer {
+		transform: none !important;
+	}
+
+	body {
+		transition: none !important;
+	}
+}

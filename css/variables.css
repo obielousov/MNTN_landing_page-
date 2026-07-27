@@ -1,0 +1,11 @@
+:root {
+  --main-color: #fff;
+  --bg: #0b1d26;
+  --accent: #fbd784;
+  --header-height: 80px;
+}
+@media (min-width: 601px) {
+  :root {
+    --header-height: 152px;
+  }
+}
