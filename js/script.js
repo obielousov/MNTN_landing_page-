@@ -2,43 +2,43 @@
 
 // ==================== BURGER MENU ====================
 
-// Отримуємо <html> для керування глобальними класами
+// Get <html> to manage global classes
 const html = document.documentElement
 
-// Чекаємо повного завантаження сторінки,
-// щоб усі елементи вже були в DOM
+// Wait for the page to fully load
+// so all elements are already in the DOM
 window.addEventListener("load", windowLoad)
 
 function windowLoad() {
-	// Один глобальний обробник кліку
+	// A single global click handler
 	document.addEventListener("click", documentActions)
 
-	// Логіка шапки при скролі
+	// Header logic on scroll
 	headerScroll()
 
-	// Ініціалізація паралаксу
+	// Parallax initialization
 	initParallax()
 
-	// Ініціалізація навігації по секціях
+	// Section navigation initialization
 	initSectionScroll()
 
-	// Анімація появи секцій при скролі
+	// Section reveal animations on scroll
 	initRevealAnimations()
 
-	// Клас після повного завантаження сторінки
+	// Class added after the page fully loads
 	html.classList.add("loaded")
 }
 
 function documentActions(e) {
-	// Елемент, по якому був клік
+	// The element that was clicked
 	const targetElement = e.target
 
-	// Якщо клік по іконці меню або її дочірньому елементу
+	// If the click is on the menu icon or its child
 	if (targetElement.closest(".icon-menu")) {
-		// Перемикаємо стан меню
+		// Toggle the menu state
 		html.classList.toggle("menu-open")
 
-		// Оновлюємо aria-expanded для accessibility
+		// Update aria-expanded for accessibility
 		const isOpen = html.classList.contains("menu-open")
 		const menuButton = document.querySelector(".icon-menu")
 		if (menuButton) {
@@ -52,11 +52,11 @@ function documentActions(e) {
 function headerScroll() {
 	const header = document.querySelector(".header")
 
-	// Якщо шапки немає — нічого не робимо
+	// If there's no header, do nothing
 	if (!header) return
 
 	function checkScroll() {
-		// Якщо сторінка трохи проскролена — додаємо клас
+		// If the page is scrolled a bit, add the class
 		if (window.scrollY > 1) {
 			header.classList.add("header-scroll-state")
 		} else {
@@ -64,10 +64,10 @@ function headerScroll() {
 		}
 	}
 
-	// Перевірка при завантаженні
+	// Check on load
 	checkScroll()
 
-	// Перевірка при скролі
+	// Check on scroll
 	window.addEventListener("scroll", checkScroll)
 }
 
@@ -79,43 +79,43 @@ function initParallax() {
 		item: "[data-prlx]",
 	}
 
-	// Знаходимо всі секції з паралаксом
+	// Find all sections with parallax
 	const parents = document.querySelectorAll(SELECTORS.parent)
 
-	// Якщо немає жодної секції — виходимо
+	// If there are no sections, exit
 	if (!parents.length) return
 
-	// Прапорець для оптимізації requestAnimationFrame
+	// Flag to optimize requestAnimationFrame calls
 	let ticking = false
 
 	function updateParallax() {
 		parents.forEach((parent) => {
-			// Усі рухомі елементи всередині секції
+			// All moving elements inside the section
 			const items = parent.querySelectorAll(SELECTORS.item)
 
 			if (!items.length) return
 
-			// Положення секції відносно viewport
+			// Section position relative to the viewport
 			const parentRect = parent.getBoundingClientRect()
 			const parentHeight = parent.offsetHeight
 			const parentTop = parentRect.top
 
-			// Рахуємо прогрес проходження секції через екран
+			// Calculate how far the section has passed through the screen
 			const rawProgress =
 				(window.innerHeight - parentTop) /
 				(window.innerHeight + parentHeight)
 
-			// Обмежуємо значення в межах 0...1
+			// Clamp the value between 0 and 1
 			const progress = Math.max(0, Math.min(rawProgress, 1))
 
 			items.forEach((item) => {
-				// Швидкість руху шару з HTML
+				// Layer speed from the HTML attribute
 				const speed = Number(item.dataset.prlxSpeed) || 5
 
-				// Напрям руху (вгору/вниз)
+				// Movement direction (up/down)
 				const direction = Number(item.dataset.prlxDirection) || -1
 
-				// Основна формула зсуву
+				// Main offset formula
 				const translateY = progress * speed * 30 * direction
 
 				item.style.transform = `translate3d(0px, ${translateY}px, 0)`
@@ -126,60 +126,60 @@ function initParallax() {
 	}
 
 	function requestTick() {
-		// Не запускаємо новий кадр, поки не завершився попередній
+		// Don't start a new frame until the previous one finishes
 		if (!ticking) {
 			requestAnimationFrame(updateParallax)
 			ticking = true
 		}
 	}
 
-	// Оновлення при скролі
+	// Update on scroll
 	window.addEventListener("scroll", requestTick)
 
-	// Оновлення при зміні розміру вікна
+	// Update on window resize
 	window.addEventListener("resize", requestTick)
 
-	// Перший запуск
+	// Initial run
 	requestTick()
 }
 
 // ==================== Scroll down ===========================
 
-// Кнопка "scroll down" в hero
+// The "scroll down" button in the hero
 const scrollDownBtn = document.querySelector(".hero__btn")
 
-// Усі секції, які беруть участь у навігації
+// All sections involved in navigation
 const sections = document.querySelectorAll("[data-section]")
 
-// Перевірка:
-// чи існує кнопка
-// чи є хоча б одна секція
+// Check:
+// whether the button exists
+// whether there is at least one section
 if (scrollDownBtn && sections.length) {
 	scrollDownBtn.addEventListener("click", () => {
-		// Знаходимо поточну секцію (в якій знаходиться кнопка)
+		// Find the current section (the one containing the button)
 		const currentSection = scrollDownBtn.closest("[data-section]")
 
 		if (!currentSection) return
 
-		// Перетворюємо NodeList в масив для зручної роботи з індексами
+		// Convert the NodeList to an array for easier index handling
 		const sectionsArray = [...sections]
 
-		// Знаходимо індекс поточної секції
+		// Find the index of the current section
 		const currentIndex = sectionsArray.indexOf(currentSection)
 
-		// Якщо секцію не знайдено — виходимо
+		// If the section wasn't found, exit
 		if (currentIndex === -1) return
 
-		// Отримуємо наступну секцію по індексу
+		// Get the next section by index
 		const nextSection = sectionsArray[currentIndex + 1]
 
-		// Якщо наступної секції нема (наприклад, остання) — нічого не робимо
+		// If there is no next section (e.g., it's the last one), do nothing
 		if (!nextSection) return
 
-		// Плавний скрол до наступної секції
+		// Smooth scroll to the next section
 		nextSection.scrollIntoView({
 			behavior: "smooth",
-			block: "end", // вирівнюємо секцію по нижньому краю viewport
+			block: "end", // align the section with the bottom edge of the viewport
 		})
 	})
 }
@@ -198,17 +198,17 @@ function initSectionScroll() {
 		active: "active",
 	}
 
-	// Список навігації по секціях
+	// Section navigation list
 	const navList = document.querySelector(SELECTORS.list)
-	// Усі кнопки, які запускають скрол
+	// All buttons that trigger scrolling
 	const scrollButtons = document.querySelectorAll(SELECTORS.button)
-	// Усі секції, до яких можна перейти
+	// All sections that can be navigated to
 	const sections = document.querySelectorAll(SELECTORS.section)
-	// Повзунок на вертикальній лінії
+	// The thumb on the vertical line
 	const scrollThumb = document.querySelector(SELECTORS.thumb)
 
-	// Захист:
-	// якщо чогось немає або екран планшетний/мобільний — логіку не запускаємо
+	// Guard:
+	// if something is missing or the screen is tablet/mobile, skip the logic
 	if (
 		!navList ||
 		!scrollThumb ||
@@ -219,37 +219,37 @@ function initSectionScroll() {
 		return
 	}
 
-	// -------------------- КЛІК ПО НАВІГАЦІЇ --------------------
+	// -------------------- NAV CLICK --------------------
 
 	navList.addEventListener("click", (e) => {
-		// Елемент, по якому був клік
+		// The element that was clicked
 		const targetElement = e.target
 
-		// Шукаємо найближчу кнопку з data-scroll
+		// Find the closest button with data-scroll
 		const currentButton = targetElement.closest(SELECTORS.button)
 
-		// Якщо клік був не по кнопці навігації — виходимо
+		// If the click wasn't on a nav button, exit
 		if (!currentButton) return
 
-		// Отримуємо назву цільової секції
+		// Get the target section name
 		const targetSection = currentButton.dataset.scroll
 
-		// Знаходимо потрібну секцію
+		// Find the target section
 		const targetBlock = document.querySelector(
 			`[data-section="${targetSection}"]`,
 		)
 
-		// Якщо секцію не знайдено — виходимо
+		// If the section wasn't found, exit
 		if (!targetBlock) return
 
-		// Якщо hero — повертаємось у самий верх сторінки
+		// If it's the hero, scroll back to the very top
 		if (targetSection === "hero") {
 			window.scrollTo({
 				top: 0,
 				behavior: "smooth",
 			})
 		} else {
-			// Для інших секцій — плавний перехід до блоку
+			// For other sections, smooth scroll to the block
 			targetBlock.scrollIntoView({
 				behavior: "smooth",
 				block: "end",
@@ -257,91 +257,91 @@ function initSectionScroll() {
 		}
 	})
 
-	// -------------------- АКТИВНИЙ ПУНКТ НАВІГАЦІЇ --------------------
+	// -------------------- ACTIVE NAV ITEM --------------------
 
 	function setActiveNavItem(currentSection) {
-		// Спочатку прибираємо active з усіх кнопок
+		// First, remove active from all buttons
 		scrollButtons.forEach((button) => {
 			button.classList.remove(CLASSNAMES.active)
 		})
 
-		// Шукаємо кнопку, яка відповідає активній секції
+		// Find the button matching the active section
 		const currentActiveButton = [...scrollButtons].find(
 			(button) => button.dataset.scroll === currentSection,
 		)
 
-		// Якщо кнопку не знайдено — виходимо
+		// If the button wasn't found, exit
 		if (!currentActiveButton) return
 
-		// Додаємо active потрібній кнопці
+		// Add active to the matching button
 		currentActiveButton.classList.add(CLASSNAMES.active)
 
-		// -------------------- РУХ ПОВЗУНКА --------------------
+		// -------------------- THUMB MOVEMENT --------------------
 
-		// Відстань кнопки від верхнього краю її контейнера
+		// Button offset from the top of its container
 		const buttonTop = currentActiveButton.offsetTop
 
-		// Висота кнопки
+		// Button height
 		const buttonHeight = currentActiveButton.offsetHeight
 
-		// Висота самого повзунка
+		// Thumb height
 		const thumbHeight = scrollThumb.offsetHeight
 
-		// Ставимо повзунок по центру активної кнопки
+		// Center the thumb on the active button
 		const thumbPosition = buttonTop + buttonHeight / 2 - thumbHeight / 2
 
-		// Рухаєм повзунок по вертикалі
+		// Move the thumb vertically
 		scrollThumb.style.transform = `translateY(${thumbPosition}px)`
 	}
 
-	// -------------------- ВИЗНАЧЕННЯ АКТИВНОЇ СЕКЦІЇ ПРИ СКРОЛІ --------------------
+	// -------------------- DETECT ACTIVE SECTION ON SCROLL --------------------
 
 	function checkActiveSection() {
-		// Контрольна лінія — верхня третина екрана
+		// Control line — the middle of the screen
 		const controlPoint = window.innerHeight / 2
 
-		// Проходимо по всіх секціях
+		// Iterate over all sections
 		for (const section of sections) {
-			// Положення секції відносно viewport
+			// Section position relative to the viewport
 			const rect = section.getBoundingClientRect()
 
-			// Якщо контрольна точка знаходиться всередині секції
+			// If the control point is inside the section
 			if (rect.top <= controlPoint && rect.bottom >= controlPoint) {
-				// Отримуємо назву поточної секції
+				// Get the current section name
 				const currentSection = section.dataset.section
 
-				// Оновлюємо активний пункт навігації
+				// Update the active nav item
 				setActiveNavItem(currentSection)
 
-				// Далі шукати не потрібно
+				// No need to keep searching
 				break
 			}
 		}
 	}
 
-	// Перший запуск при завантаженні
+	// Initial run on load
 	checkActiveSection()
 
-	// Оновлення при скролі
+	// Update on scroll
 	window.addEventListener("scroll", checkActiveSection)
 }
 
 // ==================== REVEAL ANIMATIONS ====================
 
 function initRevealAnimations() {
-	// Обираємо всі секції, які будуть анімовані при появі
+	// Select all sections that will animate on reveal
 	const sections = document.querySelectorAll("[data-section]")
 
-	// Якщо секцій нема або IntersectionObserver не підтримується
+	// If there are no sections or IntersectionObserver is unsupported
 	if (!sections.length || !("IntersectionObserver" in window)) return
 
 	const observer = new IntersectionObserver(
 		(entries) => {
 			entries.forEach((entry) => {
 				if (entry.isIntersecting) {
-					// Додаємо клас для CSS-анімації
+					// Add the class for the CSS animation
 					entry.target.classList.add("section--visible")
-					// Відписуємось — анімуємо тільки один раз
+					// Unobserve — animate only once
 					observer.unobserve(entry.target)
 				}
 			})
