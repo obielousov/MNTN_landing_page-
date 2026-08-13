@@ -1,5 +1,55 @@
 "use strict"
 
+// ==================== SMOOTH SCROLL (LENIS) ====================
+
+// Smooth inertial scrolling for the whole page.
+// Skipped when the user prefers reduced motion.
+const prefersReducedMotion = window.matchMedia(
+	"(prefers-reduced-motion: reduce)",
+).matches
+
+const lenis = prefersReducedMotion
+	? null
+	: new Lenis({
+			// Duration of one scroll gesture, in seconds
+			duration: 1.3,
+			// Soft exponential ease-out
+			easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+			// Smooth the mouse wheel
+			smoothWheel: true,
+	  })
+
+// Drive Lenis with the animation frame loop
+function lenisRaf(time) {
+	lenis.raf(time)
+	requestAnimationFrame(lenisRaf)
+}
+
+if (lenis) {
+	requestAnimationFrame(lenisRaf)
+}
+
+// Scroll to a target with Lenis when available,
+// falling back to native smooth scrolling
+function smoothScrollTo(target, options = {}) {
+	if (lenis) {
+		lenis.scrollTo(target, options)
+	} else if (typeof target === "number") {
+		window.scrollTo({ top: target, behavior: "smooth" })
+	} else {
+		target.scrollIntoView({
+			behavior: "smooth",
+			block: options.block || "start",
+		})
+	}
+}
+
+// Offset that pins the section's bottom edge
+// to the bottom of the viewport (like block: "end")
+function bottomAlignOffset(target) {
+	return target.offsetHeight - window.innerHeight
+}
+
 // ==================== BURGER MENU ====================
 
 // Get <html> to manage global classes
@@ -176,11 +226,9 @@ if (scrollDownBtn && sections.length) {
 		// If there is no next section (e.g., it's the last one), do nothing
 		if (!nextSection) return
 
-		// Smooth scroll to the next section
-		nextSection.scrollIntoView({
-			behavior: "smooth",
-			block: "end", // align the section with the bottom edge of the viewport
-		})
+		// Smooth scroll to the next section,
+		// aligning its bottom edge with the viewport bottom
+		smoothScrollTo(nextSection, { offset: bottomAlignOffset(nextSection) })
 	})
 }
 
@@ -244,15 +292,11 @@ function initSectionScroll() {
 
 		// If it's the hero, scroll back to the very top
 		if (targetSection === "hero") {
-			window.scrollTo({
-				top: 0,
-				behavior: "smooth",
-			})
+			smoothScrollTo(0)
 		} else {
 			// For other sections, smooth scroll to the block
-			targetBlock.scrollIntoView({
-				behavior: "smooth",
-				block: "end",
+			smoothScrollTo(targetBlock, {
+				offset: bottomAlignOffset(targetBlock),
 			})
 		}
 	})
