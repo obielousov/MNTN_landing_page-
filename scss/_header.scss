@@ -174,10 +174,12 @@
 		align-items: center;
 		gap: 5px;
 
+		color: var(--main-color);
+
 		font-size: clamp(0.8125rem, 0.7442rem + 0.3413vw, 1.0625rem); /* 17/13>1492-320 */
 		font-weight: 700;
 
-		transition: 0.3s ease-in-out;
+		transition: color 0.3s ease-in-out;
 
 		@media (any-hover: hover) {
 			&:hover {

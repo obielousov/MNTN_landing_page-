@@ -269,6 +269,12 @@ function initSectionScroll() {
 
 	// -------------------- NAV CLICK --------------------
 
+	// While a programmatic scroll is running, the thumb stays
+	// on the clicked item instead of tracking section by section
+	let programmaticScrollActive = false
+	// Token to ignore the end of a scroll that was replaced by a newer one
+	let programmaticScrollId = 0
+
 	navList.addEventListener("click", (e) => {
 		// The element that was clicked
 		const targetElement = e.target
@@ -289,6 +295,31 @@ function initSectionScroll() {
 
 		// If the section wasn't found, exit
 		if (!targetBlock) return
+
+		// Mark the active item immediately so the thumb
+		// responds without waiting for the scroll to arrive
+		setActiveNavItem(targetSection)
+
+		// Freeze scroll-based tracking while the programmatic
+		// scroll runs, so the thumb doesn't jump back to
+		// intermediate sections during the animation
+		const scrollId = ++programmaticScrollId
+		programmaticScrollActive = true
+
+		const endProgrammaticScroll = () => {
+			window.removeEventListener("scrollend", endProgrammaticScroll)
+			if (scrollId !== programmaticScrollId) return
+			programmaticScrollActive = false
+			// Re-sync with the actual position after the scroll ends
+			checkActiveSection()
+		}
+
+		// Lenis dispatches its own "scrollend" DOM event on
+		// window when the programmatic scroll finishes; without
+		// Lenis (reduced motion) the native scrollend fires.
+		window.addEventListener("scrollend", endProgrammaticScroll)
+		// Safety net for browsers without scrollend support
+		setTimeout(endProgrammaticScroll, 1500)
 
 		// If it's the hero, scroll back to the very top
 		if (targetSection === "hero") {
@@ -341,6 +372,10 @@ function initSectionScroll() {
 	// -------------------- DETECT ACTIVE SECTION ON SCROLL --------------------
 
 	function checkActiveSection() {
+		// While a programmatic scroll is running, the thumb
+		// already sits on the clicked item — skip the tracking
+		if (programmaticScrollActive) return
+
 		// Control line — the middle of the screen
 		const controlPoint = window.innerHeight / 2
 

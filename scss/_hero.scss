@@ -136,12 +136,16 @@
 		}
 
 		&::after {
-			background: url(../img/arrow_downward_24px.svg) center / contain no-repeat;
 			content: "";
 			width: 16px;
 			height: 24px;
 			display: inline-block;
 			flex-shrink: 0;
+
+			background-color: currentColor;
+			-webkit-mask: url(../img/arrow_downward_24px.svg) center / contain
+				no-repeat;
+			mask: url(../img/arrow_downward_24px.svg) center / contain no-repeat;
 
 			animation: scrollMove 1.5s ease-in-out infinite;
 		}
